@@ -53,14 +53,16 @@ export default function RootLayout() {
   useEffect(() => {
     if (!navigationState?.key) return;
     const inAuthGroup = segments[0] === '(tabs)';
+    const isRoot = segments.length === 0 || (segments.length === 1 && segments[0] === '');
     
     const timer = setTimeout(() => {
-      if (!user && inAuthGroup) {
+      if (!user && (inAuthGroup || isRoot)) {
         router.replace('/login');
       } else if (user && segments[0] === 'login') {
         router.replace('/(tabs)');
       }
     }, 1);
+
     return () => clearTimeout(timer);
   }, [user, segments, navigationState?.key]);
 
