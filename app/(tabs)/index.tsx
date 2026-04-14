@@ -18,7 +18,17 @@ import { InfoModal } from '../../src/components/InfoModal';
 
 
 export default function DashboardScreen() {
-  const { currentData, computedState, simulateTick, triggerSpike, triggerRecovery, history, syncLiveCGM } = useHealthStore();
+  const { 
+    currentData, 
+    computedState, 
+    simulateTick, 
+    triggerSpike, 
+    triggerRecovery, 
+    history, 
+    syncLiveCGM,
+    isSimulating 
+  } = useHealthStore();
+
   const { t } = useTranslation();
   const [hubVisible, setHubVisible] = useState(false);
   const [infoVisible, setInfoVisible] = useState(false);
@@ -91,6 +101,18 @@ export default function DashboardScreen() {
       <LiveStatusHeader onInfoPress={() => setInfoVisible(true)} />
 
       <ScrollView contentContainerStyle={styles.scroll}>
+        
+        {isSimulating === 'spike' && (
+            <View style={[styles.simBanner, { backgroundColor: THEME.colors.alert }]}>
+                <Text style={styles.simBannerText}>⚠️ CẢNH BÁO: ĐANG MÔ PHỎNG ĐỘT BIẾN ĐƯỜNG HUYẾT (SPIKE!)</Text>
+            </View>
+        )}
+        {isSimulating === 'recovery' && (
+            <View style={[styles.simBanner, { backgroundColor: THEME.colors.stability }]}>
+                <Text style={styles.simBannerText}>✅ ĐANG MÔ PHỎNG QUÁ TRÌNH HỒI PHỤC (RECOVERY...)</Text>
+            </View>
+        )}
+
         
         {/* Core 3 Metrics - Premium Pulsating Layout */}
         <Animated.View style={[styles.metricsRow, animatedMetricsStyle]}>
@@ -319,5 +341,22 @@ const styles = StyleSheet.create({
     marginTop: 15,
     textAlign: 'center',
     fontStyle: 'italic',
+  },
+  simBanner: {
+    padding: 15,
+    borderRadius: 16,
+    marginBottom: 20,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.2)',
+    shadowOpacity: 0.5,
+    shadowRadius: 15,
+  },
+  simBannerText: {
+    color: '#000',
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 0.5,
   }
 });
+

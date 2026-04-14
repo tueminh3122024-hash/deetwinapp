@@ -30,7 +30,9 @@ interface HealthStore {
     password?: string;
     sessionId?: string;
   };
+  isSimulating: 'spike' | 'recovery' | null;
   setAuth: (user: User | null) => void;
+
   updateProfile: (profile: Partial<UserProfile>) => void;
   updateCGMConfig: (config: Partial<HealthStore['cgmConfig']>) => void;
   addMeal: (meal: string) => void;
@@ -72,7 +74,9 @@ export const useHealthStore = create<HealthStore>((set, get) => ({
   history: [generateBaseline()],
   mealLog: [],
   cgmConfig: { type: 'manual' },
+  isSimulating: null,
   language: 'vn',
+
 
 
   setAuth: (user) => set({ user }),
@@ -84,9 +88,14 @@ export const useHealthStore = create<HealthStore>((set, get) => ({
     userProfile: { ...state.userProfile, ...profile } 
   })),
 
-  updateCGMConfig: (config) => set((state) => ({
-    cgmConfig: { ...state.cgmConfig, ...config }
-  })),
+  updateCGMConfig: (config) => {
+    set((state) => ({
+      cgmConfig: { ...state.cgmConfig, ...config }
+    }));
+    // Bắt đầu đồng bộ ngay lập tức
+    get().syncLiveCGM();
+  },
+
 
   addMeal: (meal) => set((state) => ({
     mealLog: [...state.mealLog, meal],
@@ -144,12 +153,25 @@ export const useHealthStore = create<HealthStore>((set, get) => ({
       timestamp: Date.now(),
     };
     
+    const computed = HealthEngine.computeAll(current, prev);
+    
+    // Cloud Sync (Supabase)
+    const user = get().user;
+    if (user) {
+      saveBiometricsToSupabase(user.id, current, computed);
+    }
+
     set((state) => ({
       currentData: current,
-      computedState: HealthEngine.computeAll(current, prev),
+      computedState: computed,
       history: [...state.history, current],
+      isSimulating: 'spike',
     }));
+
+    // Auto-clear simulation badge after 10s
+    setTimeout(() => set({ isSimulating: null }), 10000);
   },
+
 
   triggerRecovery: () => {
     const prev = get().currentData;
@@ -160,12 +182,25 @@ export const useHealthStore = create<HealthStore>((set, get) => ({
       timestamp: Date.now(),
     };
     
+    const computed = HealthEngine.computeAll(current, prev);
+
+    // Cloud Sync (Supabase)
+    const user = get().user;
+    if (user) {
+      saveBiometricsToSupabase(user.id, current, computed);
+    }
+
     set((state) => ({
       currentData: current,
-      computedState: HealthEngine.computeAll(current, prev),
+      computedState: computed,
       history: [...state.history, current],
+      isSimulating: 'recovery',
     }));
+
+    // Auto-clear simulation badge after 10s
+    setTimeout(() => set({ isSimulating: null }), 10000);
   },
+
 
   syncLiveCGM: async () => {
     const { type, url, username, password, sessionId } = get().cgmConfig;
