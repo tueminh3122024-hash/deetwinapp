@@ -28,10 +28,13 @@ export default function DashboardScreen() {
     triggerRecovery, 
     history, 
     syncLiveCGM,
-    isSimulating 
+    isSimulating,
+    activities
   } = useHealthStore();
 
   const { t } = useTranslation();
+
+
   const [hubVisible, setHubVisible] = useState(false);
   const [infoVisible, setInfoVisible] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
@@ -85,13 +88,8 @@ export default function DashboardScreen() {
     setAiLoading(false);
   };
 
-  const [activities, setActivities] = useState([
-    { id: '1', time: '10:20:05', message: 'System initialized. Waiting for sensor connection...', type: 'info' },
-    { id: '2', time: '10:20:10', message: 'Nightscout bridge connected. Fetching latest SGV...', type: 'sync' },
-    { id: '3', time: '10:21:45', message: 'AI Analysis: Glucose trend shows high variability.', type: 'ai' },
-  ]);
-
   // Simulate real-time data tick and sync with CGM every 5 seconds
+
 
   useEffect(() => {
     const interval = setInterval(() => {

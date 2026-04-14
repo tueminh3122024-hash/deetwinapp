@@ -31,7 +31,9 @@ interface HealthStore {
     sessionId?: string;
   };
   isSimulating: 'spike' | 'recovery' | null;
+  activities: { id: string, time: string, message: string, type: 'info' | 'sync' | 'ai' | 'error' }[];
   setAuth: (user: User | null) => void;
+
 
   updateProfile: (profile: Partial<UserProfile>) => void;
   updateCGMConfig: (config: Partial<HealthStore['cgmConfig']>) => void;
@@ -75,7 +77,11 @@ export const useHealthStore = create<HealthStore>((set, get) => ({
   mealLog: [],
   cgmConfig: { type: 'manual' },
   isSimulating: null,
+  activities: [
+    { id: '1', time: new Date().toLocaleTimeString(), message: 'System initialized. Waiting for sensor connection...', type: 'info' }
+  ],
   language: 'vn',
+
 
 
 
@@ -244,16 +250,26 @@ export const useHealthStore = create<HealthStore>((set, get) => ({
           const steps = await getStepCount();
           const hrv = await getLatestHRV();
 
-          get().updateBiometrics({
-              heartRate: hr,
-              steps: steps,
               hrv: hrv
           });
+          
+          set((state) => ({
+            activities: [
+              { 
+                id: Date.now().toString(), 
+                time: new Date().toLocaleTimeString(), 
+                message: `Apple HealthKit synced: ${hr} BPM, ${steps} steps.`, 
+                type: 'sync' 
+              },
+              ...state.activities.slice(0, 19)
+            ]
+          }));
           
           Alert.alert(
             "Đồng bộ thành công",
             "Dữ liệu sức khỏe đã được cập nhật từ hệ thống. (Chế độ mô phỏng nếu chạy trên Expo Go)"
           );
+
       } catch (e) {
           console.error('[Store] Sync failed', e);
           Alert.alert("Lỗi đồng bộ", "Không thể kết nối với dữ liệu sức khỏe.");
@@ -277,7 +293,20 @@ export const useHealthStore = create<HealthStore>((set, get) => ({
                 steps: steps
             });
 
+            set((state) => ({
+                activities: [
+                  { 
+                    id: Date.now().toString(), 
+                    time: new Date().toLocaleTimeString(), 
+                    message: `Health Connect synced: ${hr} BPM, ${steps} steps.`, 
+                    type: 'sync' 
+                  },
+                  ...state.activities.slice(0, 19)
+                ]
+            }));
+
             Alert.alert("Thành công", "Đã đồng bộ dữ liệu từ Google Health Connect!");
+
         } else {
             Alert.alert("Thông báo", "Vui lòng cài đặt ứng dụng Health Connect từ Play Store để sử dụng tính năng này.");
         }
