@@ -14,14 +14,9 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
-      },
-      "env": {
-        "EXPO_PUBLIC_SUPABASE_URL": "https://hvqsnizqfjhbdxkdfbiq.supabase.co",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2cXNuaXpxZmpoYmR4a2RmYmlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxMzA0NDUsImV4cCI6MjA5MDcwNjQ0NX0.K6Ztlv_op4GixvT8D9vuxqP4TT-k5D1GYc0bQ1tVso0",
-        "EXPO_PUBLIC_GEMINI_API_KEY": "AIzaSyBDwUq_DqRWV22odcwCZyrTZmYNBLHgKoM",
-        "EXPO_PUBLIC_ELEVENLABS_AGENT_ID": "agent_1801kn9nqp4wfvnvaqaycer2mn4e"
       }
     },
+
 
     "production": {
       "autoIncrement": true
