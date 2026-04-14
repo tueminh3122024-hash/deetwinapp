@@ -10,14 +10,19 @@ export default function FoodScreen() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [advice, setAdvice] = useState<FoodAdviceResponse | null>(null);
+  const [lastState, setLastState] = useState<boolean | null>(null);
 
   const isStress = computedState.msi > 1.5;
 
-  const loadAdvice = async () => {
+  const loadAdvice = async (force = false) => {
+    // Only load if state changed or forced
+    if (!force && lastState === isStress && advice) return;
+    
     setLoading(true);
     try {
         const res = await fetchGeminiFoodAdvice(currentData, computedState, language);
         setAdvice(res);
+        setLastState(isStress);
     } catch (e) {
         console.error(e);
     } finally {
@@ -27,7 +32,8 @@ export default function FoodScreen() {
 
   useEffect(() => {
     loadAdvice();
-  }, [computedState.msi]);
+  }, [isStress]);
+
 
   return (
     <ScrollView style={styles.container}>

@@ -13,14 +13,17 @@ import { Audio } from 'expo-av';
 
 import { LiveStatusHeader } from '../../src/components/LiveStatusHeader';
 import { useTranslation } from '../../src/hooks/useTranslation';
+import { InfoModal } from '../../src/components/InfoModal';
+
 
 
 export default function DashboardScreen() {
   const { currentData, computedState, simulateTick, triggerSpike, triggerRecovery, history, syncLiveCGM } = useHealthStore();
   const { t } = useTranslation();
   const [hubVisible, setHubVisible] = useState(false);
-
+  const [infoVisible, setInfoVisible] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+
 
   // Animation for metrics pulse
   const pulse = useSharedValue(1);
@@ -85,7 +88,8 @@ export default function DashboardScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <LiveStatusHeader />
+      <LiveStatusHeader onInfoPress={() => setInfoVisible(true)} />
+
       <ScrollView contentContainerStyle={styles.scroll}>
         
         {/* Core 3 Metrics - Premium Pulsating Layout */}
@@ -179,7 +183,9 @@ export default function DashboardScreen() {
 
 
         <InputHub visible={hubVisible} onClose={() => setHubVisible(false)} />
+        <InfoModal visible={infoVisible} onClose={() => setInfoVisible(false)} />
       </ScrollView>
+
     </SafeAreaView>
   );
 }

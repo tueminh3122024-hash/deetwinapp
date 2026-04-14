@@ -1,16 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
+import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native';
 import Animated, { 
   useSharedValue, 
   withRepeat, 
   withTiming, 
   useAnimatedStyle,
   withSequence,
-  interpolateColor
 } from 'react-native-reanimated';
 import { THEME } from '../constants/theme';
+import { Ionicons } from '@expo/vector-icons';
 
-export const LiveStatusHeader = () => {
+export const LiveStatusHeader = ({ onInfoPress }: { onInfoPress?: () => void }) => {
   const pulse = useSharedValue(0);
 
   React.useEffect(() => {
@@ -38,9 +38,14 @@ export const LiveStatusHeader = () => {
         <Text style={styles.tagline}>ADAPTIVE HEALTH SYSTEM</Text>
       </View>
       
-      <View style={styles.statusBadge}>
-        <Animated.View style={[styles.dot, dotStyle]} />
-        <Text style={styles.statusText}>STREAMING LIVE 24/7</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={styles.statusBadge}>
+            <Animated.View style={[styles.dot, dotStyle]} />
+            <Text style={styles.statusText}>STREAMING LIVE 24/7</Text>
+        </View>
+        <TouchableOpacity style={styles.infoBtn} onPress={onInfoPress}>
+            <Ionicons name="information-circle-outline" size={26} color={THEME.colors.textDim} />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -106,5 +111,9 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '900',
     letterSpacing: 1,
+  },
+  infoBtn: {
+    marginLeft: 15,
   }
 });
+
