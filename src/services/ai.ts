@@ -77,6 +77,10 @@ LƯU Ý: Không dùng từ tiếng Anh. Sử dụng các thuật ngữ Tiếng V
         }
       })
     });
+    if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error?.message || "Lỗi giao tiếp với máy chủ AI (Mã lỗi: " + res.status + ")");
+    }
     
     const data = await res.json();
     let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
@@ -90,12 +94,13 @@ LƯU Ý: Không dùng từ tiếng Anh. Sử dụng các thuật ngữ Tiếng V
     } catch (e) {
         console.warn("JSON Parse Failed, using direct text");
         return {
-            currentState: "Hệ thống đang ổn định lại dữ liệu, vui lòng nhấn Analyze một lần nữa nhé.",
-            prediction: "Dự kiến kết quả chính xác sẽ hiện ra ngay lập tức!"
+            currentState: "Hệ thống đang phục hồi dữ liệu từ cảm biến...",
+            prediction: "Thuật toán dự đoán tạm thời bị vô hiệu hóa."
         };
     }
-  } catch (error) {
-    return "Lỗi kết nối bộ não AI.";
+  } catch (error: any) {
+    console.error("AI Error:", error.message);
+    return `Lỗi hệ thống AI: ${error.message}`;
   }
 }
 
@@ -239,17 +244,23 @@ YÊU CẦU:
       })
     });
     
+    if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error?.message || "Lỗi AI");
+    }
+
     const data = await res.json();
     const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
     return JSON.parse(rawText);
-  } catch (e) {
-    console.error("Food AI Error:", e);
+  } catch (e: any) {
+    console.error("Food AI Error:", e.message);
     return {
-        suggestions: [{ name: "Salad Cá Hồi", desc: "Low-carb, giàu đạm và lipid tốt.", tag: "Low-carb" }],
-        avoid: [{ name: "Cơm trắng", desc: "Tinh bột nhanh gây đột biến đường huyết.", tag: "Warning" }]
+        suggestions: [{ name: "Lỗi kết nối bộ não AI", desc: e.message, tag: "Error" }],
+        avoid: [{ name: "Không thể lấy dữ liệu", desc: "Vui lòng kiểm tra lại cấu hình API Key.", tag: "Error" }]
     };
   }
 }
+
 
 export async function analyzeBiometricImage(base64Image: string): Promise<Partial<BiometricData>> {
   const GEMINI_API_KEY = (process.env.EXPO_PUBLIC_GEMINI_API_KEY || '').trim();
