@@ -250,6 +250,9 @@ export const useHealthStore = create<HealthStore>((set, get) => ({
           const steps = await getStepCount();
           const hrv = await getLatestHRV();
 
+          get().updateBiometrics({
+              heartRate: hr,
+              steps: steps,
               hrv: hrv
           });
           
@@ -264,17 +267,14 @@ export const useHealthStore = create<HealthStore>((set, get) => ({
               ...state.activities.slice(0, 19)
             ]
           }));
-          
-          Alert.alert(
-            "Đồng bộ thành công",
-            "Dữ liệu sức khỏe đã được cập nhật từ hệ thống. (Chế độ mô phỏng nếu chạy trên Expo Go)"
-          );
-
-      } catch (e) {
-          console.error('[Store] Sync failed', e);
-          Alert.alert("Lỗi đồng bộ", "Không thể kết nối với dữ liệu sức khỏe.");
+      } catch (error: any) {
+          console.error('HealthKit Sync Error:', error);
+          if (Platform.OS === 'ios') {
+              Alert.alert('Lỗi đồng bộ', 'Không thể lấy dữ liệu từ Apple Health.');
+          }
       }
   },
+
 
   syncWithAndroidHealth: async () => {
     const { Platform, Alert } = await import('react-native');
