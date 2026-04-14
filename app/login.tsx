@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ActivityIndicator, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ActivityIndicator, Image, Platform } from 'react-native';
+
 import { THEME } from '../src/constants/theme';
 import { useRouter } from 'expo-router';
 import { useHealthStore } from '../src/store/useHealthStore';
@@ -42,7 +43,8 @@ export default function LoginScreen() {
 
         <View style={styles.card}>
             <Text style={styles.welcome}>Chào mừng bạn!</Text>
-            <Text style={styles.instruction}>Đăng nhập để bắt đầu hành trình "Hack sinh học" và đồng bộ hóa 7 chỉ số sinh trắc của bạn.</Text>
+            <Text style={styles.instruction}>Đăng nhập ngay để kích hoạt hành trình Biohacking cá nhân hóa và đồng bộ hóa 7 chỉ số sinh trắc cốt lõi, mở khóa phiên bản tối ưu nhất của chính bạn.</Text>
+
 
             <TouchableOpacity 
                 style={styles.googleBtn} 
@@ -62,8 +64,9 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.footer}>
-            <Text style={styles.footerText}>Powered by Gemini 1.5 Flash & ElevenLabs</Text>
+            <Text style={styles.footerText}>Deetwin được vận hành bởi Trung Tâm Y Cứu Việt Nam.</Text>
         </View>
+
       </View>
     </SafeAreaView>
   );

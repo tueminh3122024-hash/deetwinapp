@@ -5,6 +5,8 @@ import { THEME } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from '../hooks/useTranslation';
 import { useHealthStore } from '../store/useHealthStore';
+import { supabase } from '../lib/supabase';
+
 
 
 export const WebSidebar = () => {
@@ -12,11 +14,18 @@ export const WebSidebar = () => {
   const segments = useSegments();
   const { t, language } = useTranslation();
   const toggleLanguage = useHealthStore((state) => state.toggleLanguage);
+  const setAuth = useHealthStore((state) => state.setAuth);
   
   const activeTab = segments[1] || 'index';
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setAuth(null);
+    router.replace('/login');
+  };
 
   const NavItem = ({ name, icon, label, target }: any) => {
+
     const isActive = activeTab === name;
     return (
       <TouchableOpacity 
@@ -53,10 +62,11 @@ export const WebSidebar = () => {
           <Text style={styles.langText}>{language === 'vn' ? 'Tiếng Việt' : 'English'}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.logoutBtn}>
+        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
           <Ionicons name="log-out-outline" size={20} color={THEME.colors.alert} />
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
+
       </View>
 
     </View>

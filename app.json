@@ -7,7 +7,8 @@
     "icon": "./assets/images/icon.png",
     "scheme": "deetwinapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
+    "owner": "deetwin",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.deetwin.app",
@@ -48,29 +49,18 @@
         }
       ],
       [
-        "react-native-health",
-        {
-          "healthSharePermission": "DeeTwin cần truy cập dữ liệu sức khỏe để phân tích Digital Twin của bạn.",
-          "healthUpdatePermission": "DeeTwin cần cập nhật dữ liệu sức khỏe để đồng bộ hóa trạng thái của bạn."
-        }
-      ],
-      [
-        "react-native-health-connect",
-        {
-          "healthConnectPermission": "DeeTwin cần truy cập vào Health Connect để đồng bộ chỉ số sinh trắc học."
-        }
-      ],
-      [
         "expo-build-properties",
         {
           "android": {
             "compileSdkVersion": 34,
             "targetSdkVersion": 34,
-            "minSdkVersion": 26
+            "minSdkVersion": 26,
+            "javaVersion": 17
           }
         }
       ]
     ],
+
     "experiments": {
       "typedRoutes": true
     },
