@@ -85,20 +85,24 @@ LƯU Ý: Không dùng từ tiếng Anh. Sử dụng các thuật ngữ Tiếng V
     const data = await res.json();
     let rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
     
-    console.log("AI Brain Raw Response:", rawText); // Log để debug
+    const cleanJSONStr = rawText
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
 
     try {
-        const parsed = JSON.parse(rawText);
+        const parsed = JSON.parse(cleanJSONStr);
         if (parsed.currentState && parsed.prediction) return parsed;
         throw new Error("Dữ liệu thiếu trường bắt buộc");
-    } catch (e) {
-        console.warn("JSON Parse Failed, using direct text");
+    } catch (e: any) {
+        console.warn("JSON Parse Failed, using direct text. Error:", e.message, "Raw:", rawText);
         return {
             currentState: "Hệ thống đang phục hồi dữ liệu từ cảm biến...",
-            prediction: "Thuật toán dự đoán tạm thời bị vô hiệu hóa."
+            prediction: "Thuật toán dự đoán tạm thời bị vô hiệu hóa. "
         };
     }
   } catch (error: any) {
+
     console.error("AI Error:", error.message);
     return `Lỗi hệ thống AI: ${error.message}`;
   }
@@ -251,8 +255,15 @@ YÊU CẦU:
 
     const data = await res.json();
     const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    return JSON.parse(rawText);
+    
+    const cleanJSONStr = rawText
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
+
+    return JSON.parse(cleanJSONStr);
   } catch (e: any) {
+
     console.error("Food AI Error:", e.message);
     return {
         suggestions: [{ name: "Lỗi kết nối bộ não AI", desc: e.message, tag: "Error" }],
