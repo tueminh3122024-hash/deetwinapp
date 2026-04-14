@@ -1,0 +1,23 @@
+# dependencies
+node_modules/
+
+# local env files
+.env
+.env*.local
+
+# Expo
+.expo/
+dist/
+web-build/
+
+# Native
+# android/ (We keep it if we want custom native changes, but EAS will regenerate anyway if SDK is managed)
+ios/
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store

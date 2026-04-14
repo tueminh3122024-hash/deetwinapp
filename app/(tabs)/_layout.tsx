@@ -44,7 +44,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="coach"
         options={{
-          title: 'DeepTwin',
+          title: 'DeeTwin',
           tabBarLabel: 'Coach',
           tabBarIcon: ({ color, size }) => <Ionicons name="sparkles-outline" size={size} color={color} />,
         }}

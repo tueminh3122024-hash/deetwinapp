@@ -34,7 +34,7 @@ export const TRANSLATIONS = {
   },
   en: {
     dashboard: "Dashboard",
-    coach: "DeepTwin Insights",
+    coach: "DeeTwin Insights",
     food: "Food Suggestions",
     profile: "Profile",
     live_streaming: "LIVE NOW",
