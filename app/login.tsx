@@ -19,9 +19,10 @@ export default function LoginScreen() {
         const { error } = await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: Platform.OS === 'web' ? window.location.origin : 'deetwin://login-callback'
+                redirectTo: Platform.OS === 'web' ? `${window.location.origin}/` : 'deetwin://login-callback'
             }
         });
+
         if (error) throw error;
     } catch (err: any) {
         console.error('Login Error:', err.message);
