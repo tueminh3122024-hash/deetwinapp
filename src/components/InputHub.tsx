@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Modal, Switch } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Modal, Switch, ActivityIndicator, Platform } from 'react-native';
+
 import { THEME } from '../constants/theme';
 import { useHealthStore } from '../store/useHealthStore';
 import { OCRScanner } from './OCRScanner';
@@ -27,6 +28,8 @@ export const InputHub: React.FC<Props> = ({ visible, onClose }) => {
   const [dxUsername, setDxUsername] = useState(cgmConfig.username || '');
   const [dxPassword, setDxPassword] = useState(cgmConfig.password || '');
   const [ocrVisible, setOcrVisible] = useState(false);
+  const [testingCGM, setTestingCGM] = useState(false);
+
 
   const handleSaveManual = () => {
     updateBiometrics({
@@ -53,6 +56,30 @@ export const InputHub: React.FC<Props> = ({ visible, onClose }) => {
     }
     onClose();
   };
+
+  const handleTestCGM = async () => {
+    setTestingCGM(true);
+    try {
+        if (nsUrl) {
+            const { NightscoutService } = await import('../services/cgm/Nightscout');
+            const data = await NightscoutService.fetchLatest(nsUrl);
+            if (data) alert(`Thành công! Giá trị hiện tại: ${data.sgv} mg/dL`);
+            else alert('Không thể lấy dữ liệu. Kiểm tra lại URL của bạn.');
+        } else if (dxUsername && dxPassword) {
+            const { DexcomService } = await import('../services/cgm/DexcomShare');
+            const sid = await DexcomService.login(dxUsername, dxPassword);
+            if (sid) alert('Đăng nhập Dexcom thành công!');
+            else alert('Sai tài khoản hoặc mật khẩu Dexcom.');
+        } else {
+            alert('Vui lòng nhập URL Nightscout hoặc thông tin Dexcom.');
+        }
+    } catch (e) {
+        alert('Lỗi kết nối: ' + e);
+    } finally {
+        setTestingCGM(false);
+    }
+  };
+
 
   const handleBulkImport = async () => {
     try {
@@ -221,9 +248,18 @@ export const InputHub: React.FC<Props> = ({ visible, onClose }) => {
                   />
                 </View>
 
-                <TouchableOpacity style={[styles.saveBtn, { backgroundColor: THEME.colors.primary, marginTop: 20 }]} onPress={handleSaveCGM}>
+                {testingCGM ? (
+                    <ActivityIndicator color={THEME.colors.primary} style={{ marginTop: 20 }} />
+                ) : (
+                    <TouchableOpacity style={styles.testBtn} onPress={handleTestCGM}>
+                        <Text style={styles.testBtnText}>⚡ KIỂM TRA KẾT NỐI (TEST)</Text>
+                    </TouchableOpacity>
+                )}
+
+                <TouchableOpacity style={[styles.saveBtn, { backgroundColor: THEME.colors.primary, marginTop: 15 }]} onPress={handleSaveCGM}>
                   <Text style={styles.saveBtnText}>BẮT ĐẦU LIVE STREAMING</Text>
                 </TouchableOpacity>
+
 
                 <TouchableOpacity style={styles.scanBtn} onPress={() => setOcrVisible(true)}>
                     <Text style={styles.saveBtnText}>📷 QUÉT ẢNH CẢM BIẾN (OCR)</Text>
@@ -282,4 +318,7 @@ const styles = StyleSheet.create({
   configCard: { backgroundColor: 'rgba(255,255,255,0.03)', padding: 20, borderRadius: 20, borderWidth: 1, borderColor: THEME.colors.border },
   infoText: { color: THEME.colors.textDim, fontSize: 11, marginTop: 10, fontStyle: 'italic' },
   scanBtn: { backgroundColor: 'rgba(255,255,255,0.05)', padding: 18, borderRadius: 16, alignItems: 'center', marginTop: 20, borderWidth: 1, borderColor: THEME.colors.border },
+  testBtn: { backgroundColor: 'transparent', padding: 18, borderRadius: 16, alignItems: 'center', marginTop: 20, borderWidth: 1, borderColor: THEME.colors.primary },
+  testBtnText: { color: THEME.colors.primary, fontWeight: '900', fontSize: 13 },
 });
+

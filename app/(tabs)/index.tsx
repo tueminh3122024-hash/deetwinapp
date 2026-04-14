@@ -14,6 +14,8 @@ import { Audio } from 'expo-av';
 import { LiveStatusHeader } from '../../src/components/LiveStatusHeader';
 import { useTranslation } from '../../src/hooks/useTranslation';
 import { InfoModal } from '../../src/components/InfoModal';
+import { TextInput } from 'react-native';
+
 
 
 
@@ -33,6 +35,11 @@ export default function DashboardScreen() {
   const [hubVisible, setHubVisible] = useState(false);
   const [infoVisible, setInfoVisible] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+
+  // Manual Sim Inputs
+  const [simGlucose, setSimGlucose] = useState(Math.round(currentData.glucose).toString());
+  const [simHR, setSimHR] = useState(Math.round(currentData.heartRate).toString());
+
 
 
   // Animation for metrics pulse
@@ -187,6 +194,39 @@ export default function DashboardScreen() {
         {/* Action Simulator */}
         <View style={styles.simulator}>
           <Text style={styles.cardTitle}>Diagnostic Simulator</Text>
+          
+          <View style={styles.simInputRow}>
+            <View style={styles.simInputGroup}>
+                <Text style={styles.simLabel}>Glucose</Text>
+                <TextInput 
+                    style={styles.simInput} 
+                    value={simGlucose} 
+                    onChangeText={setSimGlucose} 
+                    keyboardType="numeric" 
+                />
+            </View>
+            <View style={styles.simInputGroup}>
+                <Text style={styles.simLabel}>HR (BPM)</Text>
+                <TextInput 
+                    style={styles.simInput} 
+                    value={simHR} 
+                    onChangeText={setSimHR} 
+                    keyboardType="numeric" 
+                />
+            </View>
+            <TouchableOpacity 
+                style={styles.simSetBtn} 
+                onPress={() => {
+                    updateBiometrics({ 
+                        glucose: parseFloat(simGlucose), 
+                        heartRate: parseFloat(simHR) 
+                    });
+                }}
+            >
+                <Text style={styles.simSetText}>SET</Text>
+            </TouchableOpacity>
+          </View>
+
           <View style={styles.buttonRow}>
             <View style={{ flex: 1 }}>
                 <TouchableOpacity style={[styles.btn, { backgroundColor: THEME.colors.alert }]} onPress={triggerSpike}>
@@ -202,6 +242,7 @@ export default function DashboardScreen() {
             </View>
           </View>
         </View>
+
 
 
         <InputHub visible={hubVisible} onClose={() => setHubVisible(false)} />
@@ -342,7 +383,54 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontStyle: 'italic',
   },
+  simInputRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 10,
+    marginTop: 15,
+    marginBottom: 20,
+    backgroundColor: 'rgba(255,255,255,0.02)',
+    padding: 15,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
+  },
+  simInputGroup: {
+    flex: 1,
+  },
+  simLabel: {
+    color: THEME.colors.textDim,
+    fontSize: 9,
+    fontWeight: '700',
+    marginBottom: 6,
+    textTransform: 'uppercase',
+  },
+  simInput: {
+    backgroundColor: THEME.colors.background,
+    color: THEME.colors.text,
+    padding: 8,
+    borderRadius: 8,
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    borderWidth: 1,
+    borderColor: THEME.colors.border,
+  },
+  simSetBtn: {
+    backgroundColor: THEME.colors.primary,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 10,
+    height: 38,
+    justifyContent: 'center',
+  },
+  simSetText: {
+    color: '#000',
+    fontWeight: '900',
+    fontSize: 11,
+  },
   simBanner: {
+
     padding: 15,
     borderRadius: 16,
     marginBottom: 20,
