@@ -5,10 +5,14 @@ import { useHealthStore } from '../../src/store/useHealthStore';
 import { THEME } from '../../src/constants/theme';
 import { fetchGeminiOSAP, fetchElevenLabsVoice, OSAPResponse } from '../../src/services/ai';
 import { Audio } from 'expo-av';
+import { useTranslation } from '../../src/hooks/useTranslation';
+
 
 export default function CoachScreen() {
-  const { currentData, computedState, history } = useHealthStore();
+  const { currentData, computedState, history, language } = useHealthStore();
+  const { t } = useTranslation();
   const [advice, setAdvice] = useState<OSAPResponse | string | null>(null);
+
   const [loading, setLoading] = useState(false);
   const [audioLoading, setAudioLoading] = useState(false);
 
@@ -73,8 +77,9 @@ export default function CoachScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.header}>AI Coach 🧠</Text>
+        <Text style={styles.header}>{t('coach')} 🧠</Text>
         <Text style={styles.subHeader}>Deep Insights Engine</Text>
+
 
         <TouchableOpacity 
           style={styles.actionBtn} 
@@ -84,9 +89,10 @@ export default function CoachScreen() {
           {loading ? (
             <ActivityIndicator color="#000" />
           ) : (
-            <Text style={styles.actionBtnText}>Analyze My State ✨</Text>
+            <Text style={styles.actionBtnText}>{t('analyze').toUpperCase()} ✨</Text>
           )}
         </TouchableOpacity>
+
 
         {advice ? (
           <View>
@@ -108,9 +114,10 @@ export default function CoachScreen() {
           </View>
         ) : (
           <View style={styles.emptyCard}>
-            <Text style={styles.emptyText}>Nhấn nút trên để nhận Hiện trạng & Dự báo từ DeeTwin.</Text>
+            <Text style={styles.emptyText}>{t('ai_advice_placeholder')}</Text>
           </View>
         )}
+
       </ScrollView>
     </SafeAreaView>
   );

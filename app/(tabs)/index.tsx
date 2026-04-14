@@ -12,10 +12,14 @@ import { Audio } from 'expo-av';
 
 
 import { LiveStatusHeader } from '../../src/components/LiveStatusHeader';
+import { useTranslation } from '../../src/hooks/useTranslation';
+
 
 export default function DashboardScreen() {
   const { currentData, computedState, simulateTick, triggerSpike, triggerRecovery, history, syncLiveCGM } = useHealthStore();
+  const { t } = useTranslation();
   const [hubVisible, setHubVisible] = useState(false);
+
   const [aiLoading, setAiLoading] = useState(false);
 
   // Animation for metrics pulse
@@ -86,10 +90,11 @@ export default function DashboardScreen() {
         
         {/* Core 3 Metrics - Premium Pulsating Layout */}
         <Animated.View style={[styles.metricsRow, animatedMetricsStyle]}>
-          <MetricCircle title="Stability" value={computedState.msi} color={THEME.colors.stability} size={90} />
-          <MetricCircle title="Gl. Control" value={computedState.mgc} color={THEME.colors.primary} size={130} suffix="%" />
-          <MetricCircle title="Energy" value={computedState.eib} color={THEME.colors.energy} size={90} />
+          <MetricCircle title={t('status_stable')} value={computedState.msi} color={THEME.colors.stability} size={90} />
+          <MetricCircle title={t('glucose_control')} value={computedState.mgc} color={THEME.colors.primary} size={130} suffix="%" />
+          <MetricCircle title={t('energy_balance')} value={computedState.eib} color={THEME.colors.energy} size={90} />
         </Animated.View>
+
 
         {/* Live Streaming Chart */}
         <View style={styles.rawCard}>
@@ -97,11 +102,12 @@ export default function DashboardScreen() {
             <Text style={styles.cardTitle}>Live Glucose Stream</Text>
             <View style={styles.liveIndicator}>
                 <View style={styles.liveDot} />
-                <Text style={styles.liveLabel}>LIVE</Text>
+                <Text style={styles.liveLabel}>{t('live_streaming')}</Text>
             </View>
           </View>
           <LivePulseChart data={glucoseHistory} />
         </View>
+
 
         {/* Live Activity Feed */}
         <View style={{ marginBottom: 20 }}>
@@ -116,19 +122,21 @@ export default function DashboardScreen() {
             <Text style={styles.value}>{Math.round(currentData.glucose)} mg/dL</Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>Steps Today</Text>
+            <Text style={styles.label}>{t('steps')}</Text>
             <Text style={styles.value}>{currentData.steps}</Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>Stress Level</Text>
+            <Text style={styles.label}>{t('stress')}</Text>
             <Text style={styles.value}>{currentData.stressLevel}/10</Text>
           </View>
         </View>
 
+
         {/* Data Input System Hub */}
         <TouchableOpacity style={styles.hubTrigger} onPress={() => setHubVisible(true)}>
-            <Text style={styles.hubTriggerText}>+ OPEN DATA CONTROL HUB</Text>
+            <Text style={styles.hubTriggerText}>+ {t('sync_data').toUpperCase()}</Text>
         </TouchableOpacity>
+
 
         {/* Action Simulator */}
         <View style={styles.simulator}>

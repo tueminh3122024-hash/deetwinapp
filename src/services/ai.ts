@@ -8,6 +8,12 @@ export interface OSAPResponse {
   prediction: string;
 }
 
+export interface FoodAdviceResponse {
+  suggestions: { name: string; desc: string; tag: string }[];
+  avoid: { name: string; desc: string; tag: string }[];
+}
+
+
 export async function fetchGeminiOSAP(
   current: BiometricData, 
   state: ComputedState, 
@@ -146,3 +152,58 @@ export async function fetchElevenLabsVoice(text: string): Promise<string | null>
     return null;
   }
 }
+
+export async function fetchGeminiFoodAdvice(
+  current: BiometricData,
+  state: ComputedState,
+  lang: 'vn' | 'en' = 'vn'
+): Promise<FoodAdviceResponse> {
+  const GEMINI_API_KEY = (process.env.EXPO_PUBLIC_GEMINI_API_KEY || '').trim();
+  if (!GEMINI_API_KEY) throw new Error("API Key missing");
+
+  const prompt = `Bạn là chuyên gia dinh dưỡng DeeTwin AI. 
+NHIỆM VỤ: Dựa trên chỉ số sinh trắc để gợi ý món ăn LOW-CARB (cả món Việt và món Âu).
+TRẢ VỀ DUY NHẤT JSON.
+
+DỮ LIỆU:
+- MSI (Quá tải): ${state.msi.toFixed(2)}
+- Glucose: ${current.glucose} mg/dL
+- Trạng thái: ${state.msi > 1.5 ? 'QUÁ TẢI' : 'ỔN ĐỊNH'}
+
+YÊU CẦU:
+1. Tập trung vào thực phẩm LOW-CARB, ổn định đường huyết.
+2. Gợi ý 2 món nên ăn (suggestions) và 2 món nên tránh (avoid).
+3. Đa dạng món Việt và Âu.
+4. Ngôn ngữ: ${lang === 'vn' ? 'Tiếng Việt' : 'English'}.
+5. Sử dụng thuật ngữ chuyên môn dễ hiểu.
+
+ĐỊNH DẠNG:
+{
+  "suggestions": [{ "name": "Tên món", "desc": "Lý do (1 câu ngắn)", "tag": "Loại" }],
+  "avoid": [{ "name": "Tên món", "desc": "Lý do (1 câu ngắn)", "tag": "Lưu ý" }]
+}`;
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+  
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { responseMimeType: "application/json" }
+      })
+    });
+    
+    const data = await res.json();
+    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    return JSON.parse(rawText);
+  } catch (e) {
+    console.error("Food AI Error:", e);
+    return {
+        suggestions: [{ name: "Salad Cá Hồi", desc: "Low-carb, giàu đạm và lipid tốt.", tag: "Low-carb" }],
+        avoid: [{ name: "Cơm trắng", desc: "Tinh bột nhanh gây đột biến đường huyết.", tag: "Warning" }]
+    };
+  }
+}
+

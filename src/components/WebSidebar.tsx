@@ -3,12 +3,18 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import { useRouter, useSegments } from 'expo-router';
 import { THEME } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from '../hooks/useTranslation';
+import { useHealthStore } from '../store/useHealthStore';
+
 
 export const WebSidebar = () => {
   const router = useRouter();
   const segments = useSegments();
+  const { t, language } = useTranslation();
+  const toggleLanguage = useHealthStore((state) => state.toggleLanguage);
   
   const activeTab = segments[1] || 'index';
+
 
   const NavItem = ({ name, icon, label, target }: any) => {
     const isActive = activeTab === name;
@@ -34,19 +40,25 @@ export const WebSidebar = () => {
       </View>
       
       <ScrollView style={styles.navScroll}>
-        <NavItem name="index" icon="grid-outline" label="Dashboard" target="/(tabs)" />
-        <NavItem name="analytics" icon="stats-chart-outline" label="Analytics" target="/(tabs)/analytics" />
-        <NavItem name="coach" icon="sparkles-outline" label="AI Coach" target="/(tabs)/coach" />
-        <NavItem name="food" icon="fast-food-outline" label="Food Log" target="/(tabs)/food" />
-        <NavItem name="profile" icon="person-outline" label="Profile" target="/(tabs)/profile" />
+        <NavItem name="index" icon="grid-outline" label={t('dashboard')} target="/(tabs)" />
+        <NavItem name="coach" icon="sparkles-outline" label={t('coach')} target="/(tabs)/coach" />
+        <NavItem name="food" icon="fast-food-outline" label={t('food')} target="/(tabs)/food" />
+        <NavItem name="profile" icon="person-outline" label={t('profile')} target="/(tabs)/profile" />
       </ScrollView>
 
+
       <View style={styles.footer}>
+        <TouchableOpacity style={styles.langBtn} onPress={toggleLanguage}>
+          <Ionicons name="language-outline" size={20} color={THEME.colors.primary} />
+          <Text style={styles.langText}>{language === 'vn' ? 'Tiếng Việt' : 'English'}</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity style={styles.logoutBtn}>
           <Ionicons name="log-out-outline" size={20} color={THEME.colors.alert} />
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </View>
+
     </View>
   );
 };
@@ -111,5 +123,20 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     marginLeft: 15,
+  },
+  langBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 12,
+    marginBottom: 10,
+  },
+  langText: {
+    color: THEME.colors.text,
+    fontSize: 14,
+    fontWeight: '700',
+    marginLeft: 15,
   }
 });
+

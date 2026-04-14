@@ -38,10 +38,14 @@ interface HealthStore {
   syncWithAppleHealth: () => Promise<void>;
   syncWithAndroidHealth: () => Promise<void>;
   syncLiveCGM: () => Promise<void>;
+  language: 'vn' | 'en';
+  setLanguage: (lang: 'vn' | 'en') => void;
+  toggleLanguage: () => void;
   simulateTick: () => void;
   triggerSpike: () => void;
   triggerRecovery: () => void;
 }
+
 
 const generateBaseline = (): BiometricData => ({
   glucose: 95,
@@ -68,8 +72,13 @@ export const useHealthStore = create<HealthStore>((set, get) => ({
   history: [generateBaseline()],
   mealLog: [],
   cgmConfig: { type: 'manual' },
+  language: 'vn',
+
 
   setAuth: (user) => set({ user }),
+  setLanguage: (language) => set({ language }),
+  toggleLanguage: () => set((state) => ({ language: state.language === 'vn' ? 'en' : 'vn' })),
+
   
   updateProfile: (profile) => set((state) => ({ 
     userProfile: { ...state.userProfile, ...profile } 

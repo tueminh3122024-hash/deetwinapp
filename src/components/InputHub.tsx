@@ -139,9 +139,22 @@ export const InputHub: React.FC<Props> = ({ visible, onClose }) => {
                 <View style={styles.configCard}>
                     <Text style={styles.subLabel}>AUTO-SYNC (MOBILE ONLY)</Text>
                     <Text style={styles.infoText}>Đồng bộ dữ liệu từ Apple Watch hoặc Samsung Health của bạn qua Native Bridge.</Text>
-                    <TouchableOpacity style={[styles.saveBtn, { backgroundColor: THEME.colors.primary, marginTop: 15 }]}>
+                    <TouchableOpacity 
+                        style={[styles.saveBtn, { backgroundColor: THEME.colors.primary, marginTop: 15 }]}
+                        onPress={async () => {
+                            const { Platform } = await import('react-native');
+                            if (Platform.OS === 'ios') {
+                                useHealthStore.getState().syncWithAppleHealth();
+                            } else if (Platform.OS === 'android') {
+                                useHealthStore.getState().syncWithAndroidHealth();
+                            } else {
+                                alert('Native Sync chỉ khả dụng trên ứng dụng di động.');
+                            }
+                        }}
+                    >
                         <Text style={styles.saveBtnText}>ENABLE NATIVE SYNC</Text>
                     </TouchableOpacity>
+
                 </View>
 
                 {/* Bulk Import */}
