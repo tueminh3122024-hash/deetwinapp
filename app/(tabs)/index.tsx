@@ -90,10 +90,30 @@ export default function DashboardScreen() {
         
         {/* Core 3 Metrics - Premium Pulsating Layout */}
         <Animated.View style={[styles.metricsRow, animatedMetricsStyle]}>
-          <MetricCircle title={t('status_stable')} value={computedState.msi} color={THEME.colors.stability} size={90} />
-          <MetricCircle title={t('glucose_control')} value={computedState.mgc} color={THEME.colors.primary} size={130} suffix="%" />
-          <MetricCircle title={t('energy_balance')} value={computedState.eib} color={THEME.colors.energy} size={90} />
+          <MetricCircle 
+            title={t('metabolic_overload')} 
+            subTitle={t('metabolic_overload_desc')}
+            value={computedState.msi} 
+            color={THEME.colors.stability} 
+            size={90} 
+          />
+          <MetricCircle 
+            title={t('glucose_control')} 
+            subTitle={t('glucose_control_desc')}
+            value={computedState.mgc} 
+            color={THEME.colors.primary} 
+            size={130} 
+            suffix="%" 
+          />
+          <MetricCircle 
+            title={t('energy_balance')} 
+            subTitle={t('energy_balance_desc')}
+            value={computedState.eib} 
+            color={THEME.colors.energy} 
+            size={90} 
+          />
         </Animated.View>
+
 
 
         {/* Live Streaming Chart */}
@@ -142,14 +162,21 @@ export default function DashboardScreen() {
         <View style={styles.simulator}>
           <Text style={styles.cardTitle}>Diagnostic Simulator</Text>
           <View style={styles.buttonRow}>
-            <TouchableOpacity style={[styles.btn, { backgroundColor: THEME.colors.alert }]} onPress={triggerSpike}>
-              <Text style={styles.btnText}>Simulate Spike 🍔</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.btn, { backgroundColor: THEME.colors.stability }]} onPress={triggerRecovery}>
-              <Text style={styles.btnText}>Simulate Recovery 🏃</Text>
-            </TouchableOpacity>
+            <View style={{ flex: 1 }}>
+                <TouchableOpacity style={[styles.btn, { backgroundColor: THEME.colors.alert }]} onPress={triggerSpike}>
+                <Text style={styles.btnText}>Spike 🍔</Text>
+                </TouchableOpacity>
+                <Text style={styles.simulatorDesc}>{t('simulate_spike_desc')}</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+                <TouchableOpacity style={[styles.btn, { backgroundColor: THEME.colors.stability }]} onPress={triggerRecovery}>
+                <Text style={styles.btnText}>Recovery 🏃</Text>
+                </TouchableOpacity>
+                <Text style={styles.simulatorDesc}>{t('simulate_recovery_desc')}</Text>
+            </View>
           </View>
         </View>
+
 
         <InputHub visible={hubVisible} onClose={() => setHubVisible(false)} />
       </ScrollView>
@@ -272,6 +299,19 @@ const styles = StyleSheet.create({
     borderWidth: 1, 
     borderColor: THEME.colors.border 
   },
-  chipText: { color: THEME.colors.textDim, fontSize: 13, fontWeight: '600' }
+  chipText: { color: THEME.colors.textDim, fontSize: 13, fontWeight: '600' },
+  simulatorDesc: {
+    color: THEME.colors.textDim,
+    fontSize: 9,
+    marginTop: 8,
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  simulatorNote: {
+    color: THEME.colors.textDim,
+    fontSize: 11,
+    marginTop: 15,
+    textAlign: 'center',
+    fontStyle: 'italic',
+  }
 });
-

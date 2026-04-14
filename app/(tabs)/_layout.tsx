@@ -2,6 +2,7 @@ import { Tabs } from 'expo-router';
 import React from 'react';
 import { THEME } from '../../src/constants/theme';
 import { Platform, useWindowDimensions } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function TabLayout() {
   const { width } = useWindowDimensions();
@@ -14,15 +15,13 @@ export default function TabLayout() {
       tabBarStyle: {
         backgroundColor: THEME.colors.surface,
         borderTopColor: THEME.colors.border,
-        elevation: 0,
+        height: 60,
+        paddingBottom: 8,
         display: isWebWide ? 'none' : 'flex',
       },
-      headerShown: !isWebWide, // Hide header on web-wide as we use sidebar logo
+      headerShown: !isWebWide,
       headerStyle: {
         backgroundColor: THEME.colors.background,
-        elevation: 0,
-        shadowOpacity: 0,
-        borderBottomWidth: 0,
       },
       headerTintColor: THEME.colors.primary,
     }}>
@@ -31,27 +30,31 @@ export default function TabLayout() {
         options={{
           title: 'Dashboard',
           tabBarLabel: 'Home',
+          tabBarIcon: ({ color, size }) => <Ionicons name="grid-outline" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="analytics"
         options={{
-          title: 'Phân tích',
+          title: 'Analytics',
           tabBarLabel: 'Stat',
+          tabBarIcon: ({ color, size }) => <Ionicons name="stats-chart-outline" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="coach"
         options={{
-          title: 'AI Coach',
+          title: 'DeepTwin',
           tabBarLabel: 'Coach',
+          tabBarIcon: ({ color, size }) => <Ionicons name="sparkles-outline" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="food"
         options={{
-          title: 'Điểm Tâm',
+          title: 'Nutrition',
           tabBarLabel: 'Food',
+          tabBarIcon: ({ color, size }) => <Ionicons name="fast-food-outline" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -59,9 +62,11 @@ export default function TabLayout() {
         options={{
           title: 'Hồ Sơ',
           tabBarLabel: 'Profile',
+          tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
         }}
       />
     </Tabs>
   );
 }
+
 

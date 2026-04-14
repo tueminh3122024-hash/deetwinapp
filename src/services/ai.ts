@@ -161,6 +161,20 @@ export async function fetchGeminiFoodAdvice(
   const GEMINI_API_KEY = (process.env.EXPO_PUBLIC_GEMINI_API_KEY || '').trim();
   if (!GEMINI_API_KEY) throw new Error("API Key missing");
 
+  // Re-use model selection logic
+  if (!cachedModel) {
+    try {
+      const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${GEMINI_API_KEY}`);
+      if (listRes.ok) {
+        const listData = await listRes.json();
+        const bestModel = listData.models?.find((m: any) => m.name.includes('flash') || m.name.includes('pro'));
+        if (bestModel) cachedModel = bestModel.name;
+      }
+    } catch (e) {}
+  }
+
+  const modelNameToUse = cachedModel || "models/gemini-1.5-flash";
+
   const prompt = `Bạn là chuyên gia dinh dưỡng DeeTwin AI. 
 NHIỆM VỤ: Dựa trên chỉ số sinh trắc để gợi ý món ăn LOW-CARB (cả món Việt và món Âu).
 TRẢ VỀ DUY NHẤT JSON.
@@ -183,7 +197,7 @@ YÊU CẦU:
   "avoid": [{ "name": "Tên món", "desc": "Lý do (1 câu ngắn)", "tag": "Lưu ý" }]
 }`;
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/${modelNameToUse}:generateContent?key=${GEMINI_API_KEY}`;
   
   try {
     const res = await fetch(url, {
@@ -191,7 +205,10 @@ YÊU CẦU:
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: "application/json" }
+        generationConfig: { 
+            responseMimeType: "application/json",
+            temperature: 0.7 
+        }
       })
     });
     
@@ -206,4 +223,55 @@ YÊU CẦU:
     };
   }
 }
+
+export async function analyzeBiometricImage(base64Image: string): Promise<Partial<BiometricData>> {
+  const GEMINI_API_KEY = (process.env.EXPO_PUBLIC_GEMINI_API_KEY || '').trim();
+  if (!GEMINI_API_KEY) throw new Error("API Key missing");
+
+  const prompt = `Bạn là trợ lý giải mã dữ liệu y tế. 
+NHIỆM VỤ: Đọc ảnh (có thể là máy đo đường huyết, kết quả xét nghiệm bệnh viện, hoặc nhật ký viết tay).
+TRẢ VỀ DUY NHẤT 1 ĐỐI TƯỢNG JSON.
+
+CÁC CHỈ SỐ CẦN TÌM:
+- glucose (mg/dL hoặc mmol/L - tự quy đổi sang mg/dL nếu là mmol/L bằng cách nhân 18)
+- heartRate (nhịp tim - bpm)
+- steps (bước chân)
+- stressLevel (mức độ căng thẳng 1-10)
+
+ĐỊNH DẠNG TRẢ VỀ:
+{
+  "glucose": number,
+  "heartRate": number,
+  "steps": number,
+  "stressLevel": number
+}
+(Chỉ điền các trường tìm thấy dữ liệu).`;
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+  
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { text: prompt },
+            { inlineData: { mimeType: "image/jpeg", data: base64Image } }
+          ]
+        }],
+        generationConfig: { responseMimeType: "application/json" }
+      })
+    });
+    
+    const data = await res.json();
+    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+    return JSON.parse(rawText);
+  } catch (e) {
+    console.error("Vision AI Error:", e);
+    return {};
+  }
+}
+
+
 

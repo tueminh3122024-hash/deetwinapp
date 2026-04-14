@@ -12,12 +12,11 @@ interface OCRScannerProps {
 export const OCRScanner: React.FC<OCRScannerProps> = ({ visible, onClose, onResult }) => {
   const [permission, requestPermission] = useCameraPermissions();
   const [scanning, setScanning] = useState(false);
+  const cameraRef = React.useRef<any>(null);
 
   if (!visible) return null;
 
-  if (!permission) {
-    return <View />;
-  }
+  if (!permission) return <View />;
 
   if (!permission.granted) {
     return (
@@ -35,25 +34,44 @@ export const OCRScanner: React.FC<OCRScannerProps> = ({ visible, onClose, onResu
     );
   }
 
-  const simulateOCR = () => {
+  const handleCapture = async () => {
+    if (!cameraRef.current || scanning) return;
+    
     setScanning(true);
-    // Trong thực tế, đây là nơi gọi Google Vision API hoặc Tesseract
-    // MVP: Giả lập quá trình quét sau 2 giây
-    setTimeout(() => {
-        const fakeValue = Math.floor(Math.random() * (140 - 90 + 1)) + 90;
-        onResult(fakeValue);
+    try {
+        const photo = await cameraRef.current.takePictureAsync({
+            base64: true,
+            quality: 0.5,
+        });
+        
+        const { analyzeBiometricImage } = await import('../services/ai');
+        const results = await analyzeBiometricImage(photo.base64);
+        
+        if (results.glucose) {
+            onResult(results.glucose);
+            onClose();
+        } else {
+            alert("Không tìm thấy chỉ số. Vui lòng căn lề rõ nét hơn.");
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Lỗi AI Vision. Vui lòng thử lại.");
+    } finally {
         setScanning(false);
-        onClose();
-    }, 2000);
+    }
   };
 
   return (
     <Modal visible={visible} animationType="fade">
       <View style={styles.container}>
-        <CameraView style={styles.camera} facing="back">
+        <CameraView 
+            ref={cameraRef}
+            style={styles.camera} 
+            facing="back"
+        >
           <View style={styles.overlay}>
             <View style={styles.scanTarget} />
-            <Text style={styles.hint}> Căn lề con số trên máy đo vào khung hình </Text>
+            <Text style={styles.hint}> Căn lề thiết bị hoặc giấy tờ y tế vào khung hình </Text>
           </View>
         </CameraView>
         
@@ -61,7 +79,7 @@ export const OCRScanner: React.FC<OCRScannerProps> = ({ visible, onClose, onResu
           {scanning ? (
             <ActivityIndicator color={THEME.colors.primary} size="large" />
           ) : (
-            <TouchableOpacity style={styles.captureBtn} onPress={simulateOCR}>
+            <TouchableOpacity style={styles.captureBtn} onPress={handleCapture}>
                 <View style={styles.captureInner} />
             </TouchableOpacity>
           )}
@@ -73,6 +91,7 @@ export const OCRScanner: React.FC<OCRScannerProps> = ({ visible, onClose, onResu
     </Modal>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' },

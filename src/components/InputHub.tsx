@@ -115,6 +115,22 @@ export const InputHub: React.FC<Props> = ({ visible, onClose }) => {
                   <TextInput style={styles.input} value={glucose} onChangeText={setGlucose} keyboardType="numeric" />
                 </View>
                 <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Sleep Score (1-100)</Text>
+                  <TextInput style={styles.input} value={sleep} onChangeText={setSleep} keyboardType="numeric" />
+                </View>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Stress Level (1-10)</Text>
+                  <TextInput style={styles.input} value={stress} onChangeText={setStress} keyboardType="numeric" />
+                </View>
+                
+                <TouchableOpacity 
+                    style={[styles.saveBtn, { backgroundColor: THEME.colors.primary, marginBottom: 15 }]} 
+                    onPress={() => setOcrVisible(true)}
+                >
+                  <Text style={styles.saveBtnText}>📷 AI SCAN (CAMERA / PHOTO)</Text>
+                </TouchableOpacity>
+
+                <View style={styles.inputGroup}>
                   <Text style={styles.label}>Meal Description</Text>
                   <TextInput 
                     style={[styles.input, { height: 80 }]} 
@@ -125,9 +141,11 @@ export const InputHub: React.FC<Props> = ({ visible, onClose }) => {
                     placeholderTextColor={THEME.colors.textDim}
                   />
                 </View>
+                
                 <TouchableOpacity style={styles.saveBtn} onPress={handleSaveManual}>
                   <Text style={styles.saveBtnText}>LƯU DỮ LIỆU</Text>
                 </TouchableOpacity>
+
               </View>
             )}
 
@@ -219,8 +237,19 @@ export const InputHub: React.FC<Props> = ({ visible, onClose }) => {
       <OCRScanner 
         visible={ocrVisible} 
         onClose={() => setOcrVisible(false)} 
-        onResult={(val) => { setGlucose(val.toString()); setTab('manual'); }} 
+        onResult={(val) => { 
+            if (typeof val === 'number') {
+                setGlucose(val.toString()); 
+            } else if (typeof val === 'object') {
+                // Handle multi-metric return from AI
+                if (val.glucose) setGlucose(val.glucose.toString());
+                if (val.sleepScore) setSleep(val.sleepScore.toString());
+                if (val.stressLevel) setStress(val.stressLevel.toString());
+            }
+            setTab('manual'); 
+        }} 
       />
+
     </Modal>
   );
 };
