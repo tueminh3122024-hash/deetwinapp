@@ -82,10 +82,18 @@ export default function DashboardScreen() {
 
     const audioUrl = await fetchElevenLabsVoice(adviceText);
     if (audioUrl) {
-        const { sound } = await Audio.Sound.createAsync({ uri: audioUrl });
-        await sound.playAsync();
+        try {
+            const { sound } = await Audio.Sound.createAsync({ uri: audioUrl });
+            await sound.playAsync();
+        } catch (audioError) {
+            console.warn("Audio playback blocked (likely Web Autoplay Policy):", audioError);
+            if (Platform.OS === 'web') {
+                // Ignore silent failure on web to avoid spamming the user
+            }
+        }
     }
     setAiLoading(false);
+
   };
 
   // Simulate real-time data tick and sync with CGM every 5 seconds

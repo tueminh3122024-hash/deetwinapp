@@ -65,7 +65,15 @@ LƯU Ý: Không dùng từ tiếng Anh. Sử dụng các thuật ngữ Tiếng V
         generationConfig: { 
             temperature: 0.8, 
             maxOutputTokens: 600,
-            responseMimeType: "application/json" 
+            responseMimeType: "application/json",
+            responseSchema: {
+               type: "OBJECT",
+               properties: {
+                 currentState: { type: "STRING" },
+                 prediction: { type: "STRING" }
+               },
+               required: ["currentState", "prediction"]
+            }
         }
       })
     });
@@ -75,20 +83,8 @@ LƯU Ý: Không dùng từ tiếng Anh. Sử dụng các thuật ngữ Tiếng V
     
     console.log("AI Brain Raw Response:", rawText); // Log để debug
 
-    // Bộ bóc tách JSON cực mạnh
-    const findJSON = (str: string) => {
-        const start = str.indexOf('{');
-        const end = str.lastIndexOf('}');
-        if (start !== -1 && end !== -1) {
-            return str.substring(start, end + 1);
-        }
-        return str;
-    };
-
-    const cleanJSON = findJSON(rawText);
-    
     try {
-        const parsed = JSON.parse(cleanJSON);
+        const parsed = JSON.parse(rawText);
         if (parsed.currentState && parsed.prediction) return parsed;
         throw new Error("Dữ liệu thiếu trường bắt buộc");
     } catch (e) {
@@ -102,6 +98,7 @@ LƯU Ý: Không dùng từ tiếng Anh. Sử dụng các thuật ngữ Tiếng V
     return "Lỗi kết nối bộ não AI.";
   }
 }
+
 
 export async function fetchElevenLabsVoice(text: string): Promise<string | null> {
   const API_KEY = "09c10e4cde74de20eb214b7371aac2786696de72148d6b97caddb293abe982a5";
@@ -207,7 +204,37 @@ YÊU CẦU:
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: { 
             responseMimeType: "application/json",
-            temperature: 0.7 
+            temperature: 0.7,
+            responseSchema: {
+               type: "OBJECT",
+               properties: {
+                 suggestions: {
+                   type: "ARRAY",
+                   items: {
+                     type: "OBJECT",
+                     properties: {
+                       name: { type: "STRING" },
+                       desc: { type: "STRING" },
+                       tag: { type: "STRING" }
+                     },
+                     required: ["name", "desc", "tag"]
+                   }
+                 },
+                 avoid: {
+                   type: "ARRAY",
+                   items: {
+                     type: "OBJECT",
+                     properties: {
+                       name: { type: "STRING" },
+                       desc: { type: "STRING" },
+                       tag: { type: "STRING" }
+                     },
+                     required: ["name", "desc", "tag"]
+                   }
+                 }
+               },
+               required: ["suggestions", "avoid"]
+            }
         }
       })
     });
