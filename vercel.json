@@ -1,7 +1,7 @@
 {
   "buildCommand": "npx expo export --platform web",
   "outputDirectory": "dist",
-  "framework": "nextjs",
+  "cleanUrls": true,
   "rewrites": [
     {
       "source": "/(.*)",
@@ -9,3 +9,4 @@
     }
   ]
 }
+
