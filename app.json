@@ -9,9 +9,17 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.deetwin.app",
+      "infoPlist": {
+        "NSHealthShareUsageDescription": "DeeTwin cần truy cập dữ liệu sức khỏe để phân tích Digital Twin của bạn.",
+        "NSHealthUpdateUsageDescription": "DeeTwin cần cập nhật dữ liệu sức khỏe để đồng bộ hóa trạng thái của bạn.",
+        "NSCameraUsageDescription": "DeeTwin cần truy cập Camera để quét các chỉ số đường huyết từ máy đo của bạn.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "com.deetwin.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -22,7 +30,7 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "output": "static",
+      "output": "single",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
@@ -38,11 +46,39 @@
             "backgroundColor": "#000000"
           }
         }
+      ],
+      [
+        "react-native-health",
+        {
+          "healthSharePermission": "DeeTwin cần truy cập dữ liệu sức khỏe để phân tích Digital Twin của bạn.",
+          "healthUpdatePermission": "DeeTwin cần cập nhật dữ liệu sức khỏe để đồng bộ hóa trạng thái của bạn."
+        }
+      ],
+      [
+        "react-native-health-connect",
+        {
+          "healthConnectPermission": "DeeTwin cần truy cập vào Health Connect để đồng bộ chỉ số sinh trắc học."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "minSdkVersion": 26
+          }
+        }
       ]
     ],
     "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e5a74b86-214b-4e5b-b548-6883318cae8b"
+      }
     }
   }
 }

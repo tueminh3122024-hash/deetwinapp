@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeeTwin Health - Hệ thống Nhập liệu & Chỉ số</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #E2E8F0; background-color: #0B0D17; padding: 20px; max-width: 800px; margin: 0 auto; }
+        h1 { color: #00F0FF; text-align: center; }
+        h2 { color: #FFB800; border-bottom: 1px solid #2C2F48; padding-bottom: 5px; }
+        .card { background-color: #1A1C29; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #00FF66; }
+        .highlight { color: #00F0FF; font-weight: bold; }
+        .badge { background: #00F0FF; color: #000; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h1>DeeTwin - DATA INPUT SYSTEM</h1>
+    
+    <h2>1. No-device mode (Mặc định) <span class="badge">MVP</span></h2>
+    <div class="card">
+        <p>Nếu bạn chưa có thiết bị đeo, DeeTwin cung cấp hệ thống <strong>Synthetic Baseline</strong> để mô phỏng hoạt động cơ thể. Bạn sử dụng <strong>Quick Input Hub</strong> để nhập thủ công:</p>
+        <ul>
+            <li><strong>Giấc ngủ:</strong> Đánh giá thời gian phục hồi.</li>
+            <li><strong>Stress:</strong> Căng thẳng tâm lý ảnh hưởng trực tiếp đến đường huyết.</li>
+            <li><strong>Meal:</strong> Ghi chú bữa ăn để AI soi nguyên nhân tăng vọt.</li>
+        </ul>
+    </div>
+
+    <h2>2. Apple Health / Health Connect</h2>
+    <div class="card">
+        <p>Kết nối trực tiếp với Apple Watch hoặc iPhone HealthKit để lấy dữ liệu tự động:</p>
+        <ul>
+            <li><strong>HR / HRV:</strong> Nhịp tim thời gian thực.</li>
+            <li><strong>Sleep / Steps:</strong> Theo dõi chuyển động và phục hồi.</li>
+        </ul>
+    </div>
+
+    <h2>3. CGM Integration (Cảm biến đường huyết)</h2>
+    <div class="card">
+        <p><strong>Manual:</strong> Nhập chỉ số thử máu hoặc quét ảnh cảm biến (OCR Ready).</p>
+        <p><strong>Auto:</strong> Đồng bộ API từ <strong>Dexcom</strong> hoặc <strong>Nightscout</strong> Cloud để Dashboard nhảy số mỗi 5 phút.</p>
+    </div>
+
+    <h2>Cốt lõi: Công thức OSAP Brain</h2>
+    <div class="card">
+        <p>AI Gemini sẽ đọc chuỗi <strong>7 Metrics</strong> + các thông số trên để sinh ra <strong>OSAP (Operational State Action Plan)</strong>:</p>
+        <p>- <span class="highlight">MSI (Stability)</span>: Cho biết bạn đang ổn định hay biến thiên.</p>
+        <p>- <span class="highlight">EIB (Energy)</span>: Cho biết bạn còn bao nhiêu pin năng lượng.</p>
+        <p>- <span class="highlight">MGC (Control)</span>: Đánh giá kỷ luật ăn uống của bạn.</p>
+    </div>
+</body>
+</html>
